@@ -99,7 +99,6 @@ const ProductListing: React.FC = () => {
               to={cat === 'All' ? '/' : `/?category=${cat}`}
               className={`flex flex-col items-center gap-1 group min-w-fit ${category === cat ? 'text-blue-600' : ''}`}
             >
-            >
               <span className={`text-sm font-medium ${category === cat ? 'text-blue-600' : 'text-gray-800'} group-hover:text-blue-600`}>
                 {cat}
               </span>
