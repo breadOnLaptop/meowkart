@@ -14,6 +14,8 @@ permissions:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      VITE_API_URL: ${{ secrets.VITE_API_URL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -47,8 +49,6 @@ jobs:
         run: |
           cd frontend
           npm run build
-        env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: Upload Frontend Artifact
         uses: actions/upload-pages-artifact@v3
