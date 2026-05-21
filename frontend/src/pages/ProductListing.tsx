@@ -89,15 +89,16 @@ const ProductListing: React.FC = () => {
     await toggleWishlist(productId);
   };
 
-  return (
     <div className="bg-gray-100 min-h-screen">
-      <div className="bg-white shadow-sm border-b mb-4 hidden md:block">
-        <div className="container mx-auto px-10 max-w-[1248px] flex justify-between py-3">
+      {/* Category Navigation - Mobile (Scrollable) and Desktop */}
+      <div className="bg-white shadow-sm border-b mb-4">
+        <div className="container mx-auto px-4 md:px-10 max-w-[1248px] flex overflow-x-auto no-scrollbar justify-start md:justify-between py-3 gap-6 md:gap-0">
           {categories.map((cat) => (
             <Link
               key={cat}
               to={cat === 'All' ? '/' : `/?category=${cat}`}
-              className="flex flex-col items-center gap-1 group"
+              className={`flex flex-col items-center gap-1 group min-w-fit ${category === cat ? 'text-blue-600' : ''}`}
+            >
             >
               <span className={`text-sm font-medium ${category === cat ? 'text-blue-600' : 'text-gray-800'} group-hover:text-blue-600`}>
                 {cat}
