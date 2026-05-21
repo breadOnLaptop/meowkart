@@ -79,26 +79,4 @@ The schema includes:
 - Order/OrderItem: Immutable transaction history and shipping details.
 
 ---
-
-## Deployment & Automation
-
-This project is configured for automated deployment using **GitHub Actions**.
-
-### Frontend (GitHub Pages)
-- Triggered automatically on every push to `main`.
-- Built artifact is deployed to GitHub Pages.
-- **Note:** Ensure you set `VITE_API_URL` in your GitHub Repository Secrets to point to your hosted backend.
-
-### Backend & Database (Recommended Free Hosting)
-- **Database:** [Neon](https://neon.tech/) or [Supabase](https://supabase.com/) (Free PostgreSQL).
-- **Backend:** [Render](https://render.com/) or [Railway](https://railway.app/).
-- **Automation:** Connect your GitHub repository to Render for "Auto-deploy on Push".
-
-### Continuous Integration
-The CI pipeline (`.github/workflows/deploy.yml`) performs the following on every PR and Push:
-1. Validates Backend dependencies and Prisma schema.
-2. Builds the Frontend to ensure no production build errors.
-3. Automatically deploys the static frontend to GitHub Pages upon merging to `main`.
-
----
 *Created as part of the Meowkart Development Challenge.*
