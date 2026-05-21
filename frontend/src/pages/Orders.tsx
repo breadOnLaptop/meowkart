@@ -11,7 +11,8 @@ const Orders: React.FC = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/orders');
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const response = await axios.get(`${apiUrl}/api/orders`);
         setOrders(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error('Error fetching orders:', error);

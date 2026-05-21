@@ -48,7 +48,8 @@ const ProductListing: React.FC = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:5000/api/products`, {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const response = await axios.get(`${apiUrl}/api/products`, {
           params: { search, category, page, limit: 12 }
         });
         

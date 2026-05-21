@@ -29,7 +29,8 @@ const Checkout: React.FC = () => {
     setLoading(true);
     try {
       const fullAddress = `${address.name}, ${address.address}, ${address.locality}, ${address.city}, ${address.state} - ${address.pincode}. Phone: ${address.phone}`;
-      const response = await axios.post('http://localhost:5000/api/orders', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const response = await axios.post(`${apiUrl}/api/orders`, {
         shippingAddress: fullAddress,
       });
       clearCart();
