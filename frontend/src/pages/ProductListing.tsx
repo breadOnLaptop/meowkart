@@ -26,7 +26,7 @@ const ProductListing: React.FC = () => {
 
   // Intersection Observer for Infinite Scroll
   const observer = useRef<IntersectionObserver | null>(null);
-  const lastProductRef = useCallback((node: HTMLDivElement | null) => {
+  const lastProductRef = useCallback((node: HTMLElement | null) => {
     if (loading) return;
     if (observer.current) observer.current.disconnect();
     

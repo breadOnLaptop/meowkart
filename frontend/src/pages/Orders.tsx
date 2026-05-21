@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Package, Search, Filter } from 'lucide-react';
+import { Package, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Orders: React.FC = () => {
