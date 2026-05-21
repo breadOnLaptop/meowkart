@@ -34,17 +34,12 @@ const ProductListing: React.FC = () => {
       if (entries[0].isIntersecting && hasMore) {
         setPage(prev => prev + 1);
       }
-    }, { threshold: 1.0 }); // Only trigger when the whole item is visible at the bottom
+    }, { threshold: 1.0 });
     
     if (node) observer.current.observe(node);
   }, [loading, hasMore]);
 
-  // Combined fetching and filter reset logic to avoid race conditions
   useEffect(() => {
-    // This effect runs whenever search, category, or page changes.
-    // However, we want to reset products when search/category changes.
-    // We can detect this by checking if the page is currently 1.
-    
     const fetchProducts = async () => {
       setLoading(true);
       try {
@@ -56,10 +51,7 @@ const ProductListing: React.FC = () => {
         const newProducts = response.data.products;
         
         setProducts(prev => {
-          // If page is 1, it's a new search or category, so replace products
           if (page === 1) return newProducts;
-          
-          // Otherwise append (with duplicate protection)
           const existingIds = new Set(prev.map(p => p.id));
           const uniqueNew = newProducts.filter((p: Product) => !existingIds.has(p.id));
           return [...prev, ...uniqueNew];
@@ -76,7 +68,6 @@ const ProductListing: React.FC = () => {
     fetchProducts();
   }, [search, category, page]);
 
-  // Sync effect: Reset page to 1 when search or category changes
   useEffect(() => {
     setPage(1);
   }, [search, category]);
@@ -89,8 +80,8 @@ const ProductListing: React.FC = () => {
     await toggleWishlist(productId);
   };
 
+  return (
     <div className="bg-gray-100 min-h-screen">
-      {/* Category Navigation - Mobile (Scrollable) and Desktop */}
       <div className="bg-white shadow-sm border-b mb-4">
         <div className="container mx-auto px-4 md:px-10 max-w-[1248px] flex overflow-x-auto no-scrollbar justify-start md:justify-between py-3 gap-6 md:gap-0">
           {categories.map((cat) => (
