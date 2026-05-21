@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --color-fk-blue: #2874f0;
+  --color-fk-yellow: #ff9f00;
+  --color-fk-orange: #fb641b;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-100 text-gray-800;
+  }
+}
+
+@layer components {
+  .fk-button-yellow {
+    @apply bg-fk-yellow text-white font-medium py-3 px-10 rounded-sm hover:shadow-md transition-all uppercase;
+  }
+
+  .fk-button-orange {
+    @apply bg-fk-orange text-white font-medium py-3 px-10 rounded-sm hover:shadow-md transition-all uppercase;
+  }
+}
