@@ -15,7 +15,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     env:
-      VITE_API_URL: ${{ secrets.VITE_API_URL }}
+      VITE_API_URL: https://meowkart-backend.onrender.com
     steps:
       - uses: actions/checkout@v4
 

@@ -22,7 +22,7 @@ function App() {
   }, [fetchCart, fetchWishlist]);
 
   return (
-    <Router>
+    <Router basename="/meowkart">
       <div className="min-h-screen bg-gray-100 flex flex-col">
         <Header />
         <main className="flex-1">
