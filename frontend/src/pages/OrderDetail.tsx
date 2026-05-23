@@ -7,21 +7,39 @@ const OrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [cancelling, setCancelling] = useState(false);
+
+  const fetchOrder = async () => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const response = await axios.get(`${apiUrl}/api/orders/${id}`);
+      setOrder(response.data);
+    } catch (error) {
+      console.error('Error fetching order detail:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        const response = await axios.get(`${apiUrl}/api/orders/${id}`);
-        setOrder(response.data);
-      } catch (error) {
-        console.error('Error fetching order detail:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchOrder();
   }, [id]);
+
+  const handleCancelOrder = async () => {
+    if (!window.confirm('Are you sure you want to cancel this order?')) return;
+    
+    setCancelling(true);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      await axios.post(`${apiUrl}/api/orders/${id}/cancel`);
+      alert('Order cancelled successfully. Stock has been restored.');
+      await fetchOrder();
+    } catch (error: any) {
+      alert(error.response?.data?.error || 'Failed to cancel order');
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   if (loading) return <div className="p-10 text-center">Loading Order Details...</div>;
   if (!order) return <div className="p-10 text-center">Order not found.</div>;
@@ -39,13 +57,15 @@ const OrderDetail: React.FC = () => {
       <div className="bg-white shadow-sm border rounded-sm mb-4">
          <div className="p-6 border-b flex flex-col md:flex-row justify-between gap-6">
             <div className="flex-1">
-               <h2 className="font-bold text-sm mb-4">Delivery Address</h2>
-               <p className="text-sm font-bold text-gray-800 mb-1">Default User</p>
-               <p className="text-sm text-gray-600 leading-relaxed max-w-xs">
-                 {order.shippingAddress || '123, Meow Street, Cat City, 400001, India'}
+               <h2 className="font-bold text-sm mb-4 uppercase text-gray-500">Delivery Address</h2>
+               <p className="text-sm font-bold text-gray-800 mb-1">
+                 {order.shippingAddress ? order.shippingAddress.split(',')[0] : (order.address?.name || 'Default User')}
                </p>
-               <p className="text-sm font-bold text-gray-800 mt-3">Phone number</p>
-               <p className="text-sm text-gray-600">9876543210</p>
+               <p className="text-sm text-gray-600 leading-relaxed max-w-sm">
+                 {order.shippingAddress || (order.address ? 
+                   `${order.address.name}, ${order.address.addressLine}, ${order.address.locality}, ${order.address.city}, ${order.address.state} - ${order.address.pincode}. Phone: ${order.address.phone}` : 
+                   'Address details not available for this order')}
+               </p>
             </div>
 
             <div className="md:w-72">
@@ -55,12 +75,28 @@ const OrderDetail: React.FC = () => {
                      <Download size={16} className="text-blue-600" />
                      Download Invoice
                   </button>
+                  {['PENDING', 'PROCESSING'].includes(order.status) && (
+                    <button 
+                      onClick={handleCancelOrder}
+                      disabled={cancelling}
+                      className="text-sm font-bold text-red-600 hover:bg-red-50 border border-red-100 px-4 py-2 rounded-sm w-fit disabled:opacity-50"
+                    >
+                      {cancelling ? 'Cancelling...' : 'Cancel Order'}
+                    </button>
+                  )}
                </div>
             </div>
          </div>
       </div>
 
       <div className="bg-white shadow-sm border rounded-sm mb-4 overflow-hidden">
+         <div className="p-4 bg-gray-50 border-b flex items-center gap-2">
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
+              order.status === 'CANCELLED' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+            }`}>
+              {order.status}
+            </span>
+         </div>
          {order.items.map((item: any) => (
             <div key={item.id} className="p-6 flex flex-col md:flex-row gap-6 border-b last:border-b-0">
                <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center border p-1">

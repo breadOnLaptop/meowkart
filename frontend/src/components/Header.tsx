@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, ChevronDown, Package, Heart } from 'lucide-react';
+import { Search, ShoppingCart, ChevronDown, Package, Heart, MapPin } from 'lucide-react';
 import { useCartStore } from '../store/useCartStore';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -69,6 +69,9 @@ const Header: React.FC = () => {
                   </Link>
                   <Link to="/wishlist" className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-100 text-sm font-medium">
                     <Heart size={18} className="text-blue-600" /> Wishlist
+                  </Link>
+                  <Link to="/addresses" className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-100 text-sm font-medium">
+                    <MapPin size={18} className="text-blue-600" /> My Addresses
                   </Link>
                 </div>
                 {/* Arrow indicator */}

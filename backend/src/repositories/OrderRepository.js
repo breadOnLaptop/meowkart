@@ -1,8 +1,8 @@
 const prisma = require('../config/prisma');
 
 class OrderRepository {
-  async createOrder(data) {
-    return prisma.order.create({ data });
+  async createOrder(data, tx = prisma) {
+    return tx.order.create({ data });
   }
 
   async findAllByUserId(userId) {
@@ -16,7 +16,10 @@ class OrderRepository {
   async findById(id) {
     return prisma.order.findUnique({
       where: { id },
-      include: { items: { include: { product: true } } },
+      include: { 
+        items: { include: { product: true } },
+        address: true
+      },
     });
   }
 }

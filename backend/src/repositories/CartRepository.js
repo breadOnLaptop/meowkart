@@ -37,8 +37,8 @@ class CartRepository {
     return prisma.cartItem.delete({ where: { id } });
   }
 
-  async clearCart(cartId) {
-    return prisma.cartItem.deleteMany({ where: { cartId } });
+  async clearCart(cartId, tx = prisma) {
+    return tx.cartItem.deleteMany({ where: { cartId } });
   }
 }
 

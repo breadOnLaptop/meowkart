@@ -16,8 +16,25 @@ model User {
   orders    Order[]
   cart      Cart?
   wishlist  Wishlist?
+  addresses Address[]
   products  Product[] @relation("SellerProducts") // Products listed by this user (if seller)
   createdAt DateTime  @default(now())
+}
+
+model Address {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  name        String
+  phone       String
+  pincode     String
+  locality    String
+  addressLine String
+  city        String
+  state       String
+  isDefault   Boolean  @default(false)
+  orders      Order[]
+  createdAt   DateTime @default(now())
 }
 
 model Product {
@@ -72,9 +89,11 @@ model Order {
   id              Int         @id @default(autoincrement())
   userId          Int
   user            User        @relation(fields: [userId], references: [id])
+  addressId       Int?
+  address         Address?    @relation(fields: [addressId], references: [id])
   totalAmount     Float
-  shippingAddress String
-  status          String      @default("Pending")
+  shippingAddress String?     // Fallback string for legacy or external data
+  status          String      @default("PENDING") // PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
   items           OrderItem[]
   createdAt       DateTime    @default(now())
 }
