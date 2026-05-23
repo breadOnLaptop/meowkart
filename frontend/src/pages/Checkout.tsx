@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useCartStore } from '../store/useCartStore';
 import { useAddressStore } from '../store/useAddressStore';
-import { CheckCircle2, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 const Checkout: React.FC = () => {
   const { items, clearCart } = useCartStore();

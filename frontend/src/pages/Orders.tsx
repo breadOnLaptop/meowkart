@@ -61,7 +61,6 @@ const Orders: React.FC = () => {
     // 3. Time Filter
     if (timeFilters.length > 0) {
       const orderDate = new Date(order.createdAt);
-      const currentYear = new Date().getFullYear();
       const isMatch = timeFilters.some(filter => {
         if (filter === 'Last 30 days') {
           const thirtyDaysAgo = new Date();
