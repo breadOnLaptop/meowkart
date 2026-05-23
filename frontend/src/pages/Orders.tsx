@@ -7,6 +7,8 @@ const Orders: React.FC = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilters, setStatusFilters] = useState<string[]>([]);
+  const [timeFilters, setTimeFilters] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -24,10 +26,58 @@ const Orders: React.FC = () => {
     fetchOrders();
   }, []);
 
-  const filteredOrders = orders.filter(order => 
-    order.id.toString().includes(searchQuery) || 
-    order.items.some((item: any) => item.product.name.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const handleStatusChange = (status: string) => {
+    setStatusFilters(prev => 
+      prev.includes(status) ? prev.filter(s => s !== status) : [...prev, status]
+    );
+  };
+
+  const handleTimeChange = (time: string) => {
+    setTimeFilters(prev => 
+      prev.includes(time) ? prev.filter(t => t !== time) : [...prev, time]
+    );
+  };
+
+  const filteredOrders = orders.filter(order => {
+    // 1. Search Query Filter
+    const matchesSearch = order.id.toString().includes(searchQuery) || 
+      order.items.some((item: any) => item.product.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    if (!matchesSearch) return false;
+
+    // 2. Status Filter
+    if (statusFilters.length > 0) {
+      // Mapping static filter names to DB status
+      const statusMap: Record<string, string> = {
+        'On the way': 'SHIPPED',
+        'Delivered': 'DELIVERED',
+        'Cancelled': 'CANCELLED',
+        'Processing': 'PROCESSING'
+      };
+      const activeDbStatuses = statusFilters.map(f => statusMap[f]).filter(Boolean);
+      if (activeDbStatuses.length > 0 && !activeDbStatuses.includes(order.status)) return false;
+    }
+
+    // 3. Time Filter
+    if (timeFilters.length > 0) {
+      const orderDate = new Date(order.createdAt);
+      const currentYear = new Date().getFullYear();
+      const isMatch = timeFilters.some(filter => {
+        if (filter === 'Last 30 days') {
+          const thirtyDaysAgo = new Date();
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+          return orderDate >= thirtyDaysAgo;
+        }
+        if (filter === '2026') return orderDate.getFullYear() === 2026;
+        if (filter === '2025') return orderDate.getFullYear() === 2025;
+        if (filter === 'Older') return orderDate.getFullYear() < 2025;
+        return true;
+      });
+      if (!isMatch) return false;
+    }
+
+    return true;
+  });
 
   if (loading) {
     return (
@@ -52,9 +102,14 @@ const Orders: React.FC = () => {
             <div className="p-4 border-b">
               <h3 className="font-bold text-xs uppercase text-gray-500 mb-3">Order Status</h3>
               <div className="flex flex-col gap-2">
-                {['On the way', 'Delivered', 'Cancelled', 'Returned'].map(status => (
+                {['On the way', 'Delivered', 'Cancelled', 'Processing'].map(status => (
                   <label key={status} className="flex items-center gap-2 text-sm cursor-pointer hover:text-blue-600">
-                    <input type="checkbox" className="w-4 h-4" />
+                    <input 
+                      type="checkbox" 
+                      className="w-4 h-4" 
+                      checked={statusFilters.includes(status)}
+                      onChange={() => handleStatusChange(status)}
+                    />
                     <span>{status}</span>
                   </label>
                 ))}
@@ -64,9 +119,14 @@ const Orders: React.FC = () => {
             <div className="p-4">
               <h3 className="font-bold text-xs uppercase text-gray-500 mb-3">Order Time</h3>
               <div className="flex flex-col gap-2">
-                {['Last 30 days', '2025', '2024', 'Older'].map(time => (
+                {['Last 30 days', '2026', '2025', 'Older'].map(time => (
                   <label key={time} className="flex items-center gap-2 text-sm cursor-pointer hover:text-blue-600">
-                    <input type="checkbox" className="w-4 h-4" />
+                    <input 
+                      type="checkbox" 
+                      className="w-4 h-4" 
+                      checked={timeFilters.includes(time)}
+                      onChange={() => handleTimeChange(time)}
+                    />
                     <span>{time}</span>
                   </label>
                 ))}
