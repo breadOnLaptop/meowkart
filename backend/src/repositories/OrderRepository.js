@@ -16,7 +16,10 @@ class OrderRepository {
   async findById(id) {
     return prisma.order.findUnique({
       where: { id },
-      include: { items: { include: { product: true } } },
+      include: { 
+        items: { include: { product: true } },
+        address: true
+      },
     });
   }
 }

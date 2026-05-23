@@ -59,10 +59,12 @@ const OrderDetail: React.FC = () => {
             <div className="flex-1">
                <h2 className="font-bold text-sm mb-4 uppercase text-gray-500">Delivery Address</h2>
                <p className="text-sm font-bold text-gray-800 mb-1">
-                 {order.shippingAddress?.split(',')[0]}
+                 {order.shippingAddress ? order.shippingAddress.split(',')[0] : (order.address?.name || 'Default User')}
                </p>
                <p className="text-sm text-gray-600 leading-relaxed max-w-sm">
-                 {order.shippingAddress || 'Address not available'}
+                 {order.shippingAddress || (order.address ? 
+                   `${order.address.name}, ${order.address.addressLine}, ${order.address.locality}, ${order.address.city}, ${order.address.state} - ${order.address.pincode}. Phone: ${order.address.phone}` : 
+                   'Address details not available for this order')}
                </p>
             </div>
 
