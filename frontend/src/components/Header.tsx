@@ -70,6 +70,9 @@ const Header: React.FC = () => {
                   <Link to="/wishlist" className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-100 text-sm font-medium">
                     <Heart size={18} className="text-blue-600" /> Wishlist
                   </Link>
+                  <Link to="/addresses" className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-100 text-sm font-medium">
+                    <MapPin size={18} className="text-blue-600" /> My Addresses
+                  </Link>
                 </div>
                 {/* Arrow indicator */}
                 <div className="absolute top-full right-10 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[8px] border-b-white z-50"></div>

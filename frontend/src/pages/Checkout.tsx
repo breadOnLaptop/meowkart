@@ -1,43 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useCartStore } from '../store/useCartStore';
+import { useAddressStore } from '../store/useAddressStore';
+import { CheckCircle2, Plus } from 'lucide-react';
 
 const Checkout: React.FC = () => {
   const { items, clearCart } = useCartStore();
-  const [address, setAddress] = useState({
-    name: 'Default User',
-    phone: '9876543210',
-    pincode: '400001',
-    locality: 'Fort',
-    address: '123, Meow Street',
-    city: 'Mumbai',
-    state: 'Maharashtra',
-  });
+  const { addresses, fetchAddresses } = useAddressStore();
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1); // 1: Address, 2: Summary
   const navigate = useNavigate();
 
+  useEffect(() => {
+    fetchAddresses();
+  }, []);
+
+  useEffect(() => {
+    if (addresses.length > 0 && !selectedAddressId) {
+      const defaultAddr = addresses.find(a => a.isDefault) || addresses[0];
+      setSelectedAddressId(defaultAddr.id);
+    }
+  }, [addresses]);
+
   const totalAmount = items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddressSelect = (id: number) => {
+    setSelectedAddressId(id);
+  };
+
+  const handleNextStep = () => {
+    if (!selectedAddressId) {
+      alert('Please select or add a delivery address');
+      return;
+    }
     setStep(2);
   };
 
   const placeOrder = async () => {
     setLoading(true);
     try {
-      const fullAddress = `${address.name}, ${address.address}, ${address.locality}, ${address.city}, ${address.state} - ${address.pincode}. Phone: ${address.phone}`;
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const response = await axios.post(`${apiUrl}/api/orders`, {
-        shippingAddress: fullAddress,
+        addressId: selectedAddressId,
       });
       clearCart();
       navigate(`/order-success/${response.data.id}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error placing order:', error);
-      alert('Failed to place order.');
+      alert(error.response?.data?.error || 'Failed to place order.');
     } finally {
       setLoading(false);
     }
@@ -47,6 +59,8 @@ const Checkout: React.FC = () => {
     navigate('/cart');
     return null;
   }
+
+  const selectedAddress = addresses.find(a => a.id === selectedAddressId);
 
   return (
     <div className="container mx-auto px-4 md:px-10 py-6 max-w-[1248px] flex flex-col lg:flex-row gap-6">
@@ -68,59 +82,49 @@ const Checkout: React.FC = () => {
           </div>
           
           {step === 1 && (
-            <form onSubmit={handleSubmit} className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <input 
-                  type="text" 
-                  placeholder="Name" 
-                  className="border p-3 rounded-sm focus:outline-blue-600 text-sm" 
-                  value={address.name}
-                  onChange={(e) => setAddress({...address, name: e.target.value})}
-                  required
-                />
-                <input 
-                  type="text" 
-                  placeholder="10-digit mobile number" 
-                  className="border p-3 rounded-sm focus:outline-blue-600 text-sm" 
-                  value={address.phone}
-                  onChange={(e) => setAddress({...address, phone: e.target.value})}
-                  required
-                />
-                <input 
-                  type="text" 
-                  placeholder="Pincode" 
-                  className="border p-3 rounded-sm focus:outline-blue-600 text-sm" 
-                  value={address.pincode}
-                  onChange={(e) => setAddress({...address, pincode: e.target.value})}
-                  required
-                />
-                <input 
-                  type="text" 
-                  placeholder="Locality" 
-                  className="border p-3 rounded-sm focus:outline-blue-600 text-sm" 
-                  value={address.locality}
-                  onChange={(e) => setAddress({...address, locality: e.target.value})}
-                  required
-                />
-              </div>
-              <textarea 
-                placeholder="Address (Area and Street)" 
-                className="w-full border p-3 rounded-sm focus:outline-blue-600 mb-4 h-24 text-sm"
-                value={address.address}
-                onChange={(e) => setAddress({...address, address: e.target.value})}
-                required
-              />
-              <button 
-                type="submit" 
-                className="bg-[#fb641b] text-white px-10 py-3.5 font-bold rounded-sm shadow-md uppercase tracking-wider text-sm"
+            <div className="p-0">
+              {addresses.map((addr) => (
+                <div 
+                  key={addr.id} 
+                  onClick={() => handleAddressSelect(addr.id)}
+                  className={`p-6 border-b cursor-pointer flex gap-4 items-start transition-colors ${selectedAddressId === addr.id ? 'bg-blue-50/50' : 'hover:bg-gray-50'}`}
+                >
+                  <div className={`w-5 h-5 rounded-full border-2 mt-1 flex items-center justify-center flex-shrink-0 ${selectedAddressId === addr.id ? 'border-blue-600' : 'border-gray-300'}`}>
+                    {selectedAddressId === addr.id && <div className="w-2.5 h-2.5 rounded-full bg-blue-600"></div>}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-4 mb-2">
+                      <span className="font-bold text-sm">{addr.name}</span>
+                      <span className="font-bold text-sm">{addr.phone}</span>
+                    </div>
+                    <p className="text-sm text-gray-700">
+                      {addr.addressLine}, {addr.locality}, {addr.city}, {addr.state} - <span className="font-bold">{addr.pincode}</span>
+                    </p>
+                    {selectedAddressId === addr.id && (
+                      <button 
+                        onClick={handleNextStep}
+                        className="mt-4 bg-[#fb641b] text-white px-10 py-3 font-bold rounded-sm shadow-md uppercase text-sm"
+                      >
+                        Deliver Here
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+              
+              <div 
+                onClick={() => navigate('/addresses')}
+                className="p-6 flex items-center gap-4 text-blue-600 font-bold text-sm uppercase cursor-pointer hover:bg-gray-50"
               >
-                Deliver Here
-              </button>
-            </form>
+                <Plus size={18} />
+                Add a new address
+              </div>
+            </div>
           )}
-          {step > 1 && (
-            <div className="p-4 text-sm font-medium">
-               {address.name}, {address.address}, {address.city} - {address.pincode}
+          {step > 1 && selectedAddress && (
+            <div className="p-4 text-sm font-medium flex justify-between items-center">
+               <span>{selectedAddress.name}, {selectedAddress.addressLine}, {selectedAddress.city} - {selectedAddress.pincode}</span>
+               <button onClick={() => setStep(1)} className="text-blue-600 font-bold uppercase text-xs border px-4 py-2 rounded-sm shadow-sm">Change</button>
             </div>
           )}
         </div>

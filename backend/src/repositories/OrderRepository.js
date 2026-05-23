@@ -1,8 +1,8 @@
 const prisma = require('../config/prisma');
 
 class OrderRepository {
-  async createOrder(data) {
-    return prisma.order.create({ data });
+  async createOrder(data, tx = prisma) {
+    return tx.order.create({ data });
   }
 
   async findAllByUserId(userId) {
