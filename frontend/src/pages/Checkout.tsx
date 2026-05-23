@@ -149,7 +149,7 @@ const Checkout: React.FC = () => {
                  </div>
                ))}
                <div className="p-4 flex items-center justify-between">
-                  <p className="text-sm">Order confirmation email will be sent to <b>{address.name}</b></p>
+                  <p className="text-sm">Order confirmation email will be sent to <b>{selectedAddress?.name}</b></p>
                   <button 
                     onClick={placeOrder}
                     disabled={loading}
