@@ -57,13 +57,13 @@ const OrderDetail: React.FC = () => {
       <div className="bg-white shadow-sm border rounded-sm mb-4">
          <div className="p-6 border-b flex flex-col md:flex-row justify-between gap-6">
             <div className="flex-1">
-               <h2 className="font-bold text-sm mb-4">Delivery Address</h2>
-               <p className="text-sm font-bold text-gray-800 mb-1">Default User</p>
-               <p className="text-sm text-gray-600 leading-relaxed max-w-xs">
-                 {order.shippingAddress || '123, Meow Street, Cat City, 400001, India'}
+               <h2 className="font-bold text-sm mb-4 uppercase text-gray-500">Delivery Address</h2>
+               <p className="text-sm font-bold text-gray-800 mb-1">
+                 {order.shippingAddress?.split(',')[0]}
                </p>
-               <p className="text-sm font-bold text-gray-800 mt-3">Phone number</p>
-               <p className="text-sm text-gray-600">9876543210</p>
+               <p className="text-sm text-gray-600 leading-relaxed max-w-sm">
+                 {order.shippingAddress || 'Address not available'}
+               </p>
             </div>
 
             <div className="md:w-72">

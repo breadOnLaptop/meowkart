@@ -37,11 +37,20 @@ class OrderService {
         });
       }
 
-      // 3. Create Order
+      // 3. Prepare Address String
+      let finalShippingAddress = shippingAddress;
+      if (addressId) {
+        const addrEntity = await tx.address.findUnique({ where: { id: addressId } });
+        if (addrEntity) {
+          finalShippingAddress = `${addrEntity.name}, ${addrEntity.addressLine}, ${addrEntity.locality}, ${addrEntity.city}, ${addrEntity.state} - ${addrEntity.pincode}. Phone: ${addrEntity.phone}`;
+        }
+      }
+
+      // 4. Create Order
       const order = await orderRepository.createOrder({
         userId,
         addressId,
-        shippingAddress,
+        shippingAddress: finalShippingAddress,
         totalAmount,
         status: 'PENDING',
         items: {
@@ -49,7 +58,7 @@ class OrderService {
         }
       }, tx);
 
-      // 4. Clear Cart
+      // 5. Clear Cart
       await cartRepository.clearCart(cart.id, tx);
 
       console.log(`Order #${order.id} placed successfully. Stock deducted and cart cleared.`);
